@@ -5,6 +5,7 @@ const mockttp = require('mockttp');
 const detectPort = require('detect-port');
 const { difference } = require('lodash');
 const WebSocket = require('ws');
+const { injectDriver } = require('js-uitestfix');
 const createStaticServer = require('../../development/create-static-server');
 const { setupMocking } = require('./mock-e2e');
 const { Anvil } = require('./seeder/anvil');
@@ -126,6 +127,7 @@ async function withFixtures(options, testSuite) {
     ethConversionInUsd,
     monConversionInUsd,
     manifestFlags,
+    collectData = false,
   } = options;
 
   // Normalize localNodeOptions
@@ -278,30 +280,37 @@ async function withFixtures(options, testSuite) {
     extensionId = wd.extensionId;
     webDriver = driver.driver;
 
+    if (collectData) {
+      driver.driver = await injectDriver(await webDriver, title, {
+        outputDir: path.join(__dirname, '../../output'),
+        configPath: path.join(__dirname, '../../config.properties'),
+      });
+    }
+
     if (process.env.SELENIUM_BROWSER === 'chrome') {
       await driver.checkBrowserForExceptions(ignoredConsoleErrors);
       await driver.checkBrowserForConsoleErrors(ignoredConsoleErrors);
     }
 
     let driverProxy;
-    if (process.env.E2E_DEBUG === 'true') {
-      driverProxy = new Proxy(driver, {
-        get(target, prop, receiver) {
-          const originalProperty = target[prop];
-          if (typeof originalProperty === 'function') {
-            return (...args) => {
-              console.log(
-                `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
-                  args,
-                ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
-              );
-              return originalProperty.bind(target)(...args);
-            };
-          }
-          return Reflect.get(target, prop, receiver);
-        },
-      });
-    }
+    // if (process.env.E2E_DEBUG === 'true') {
+    //   driverProxy = new Proxy(driver, {
+    //     get(target, prop, receiver) {
+    //       const originalProperty = target[prop];
+    //       if (typeof originalProperty === 'function') {
+    //         return (...args) => {
+    //           console.log(
+    //             `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
+    //               args,
+    //             ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
+    //           );
+    //           return originalProperty.bind(target)(...args);
+    //         };
+    //       }
+    //       return Reflect.get(target, prop, receiver);
+    //     },
+    //   });
+    // }
 
     console.log(`\nExecuting testcase: '${title}'\n`);
 

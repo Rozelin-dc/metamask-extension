@@ -26,6 +26,7 @@ class ChromeDriver {
     openDevToolsForTabs,
     responsive,
     constrainWindowSize,
+    windowSize,
     port,
     proxyPort,
   }) {
@@ -50,7 +51,9 @@ class ChromeDriver {
       args.push('--auto-open-devtools-for-tabs');
     }
 
-    if (constrainWindowSize) {
+    if (windowSize) {
+      args.push(`--window-size=${windowSize.width},${windowSize.height}`);
+    } else if (constrainWindowSize) {
       args.push('--window-size=320,600');
     }
 
@@ -70,6 +73,8 @@ class ChromeDriver {
     } else {
       args.push('--no-sandbox');
     }
+
+    // args.push('--headless');
 
     const options = new chrome.Options().addArguments(args);
     options.setAcceptInsecureCerts(true);

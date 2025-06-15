@@ -594,6 +594,7 @@
     "jest-environment-jsdom": "patch:jest-environment-jsdom@npm%3A29.7.0#~/.yarn/patches/jest-environment-jsdom-npm-29.7.0-0b72dd0e0b.patch",
     "jest-fixed-jsdom": "^0.0.9",
     "jest-preview": "^0.3.1",
+    "js-uitestfix": "file:../JS-UITestFix",
     "jsdom": "^16.7.0",
     "json-schema-to-ts": "^3.0.1",
     "koa": "^2.7.0",

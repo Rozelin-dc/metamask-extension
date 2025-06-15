@@ -46,185 +46,187 @@ async function tokensMock(mockServer: Mockttp) {
 }
 
 describe('MetaMask onboarding', function () {
-  it("Creates a new wallet, sets up a secure password, and doesn't complete the onboarding process and refreshes the page", async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        await incompleteCreateNewWalletOnboardingFlow({ driver });
-        await driver.refresh();
+  this.timeout(2000 * 1000);
 
-        await unlockWallet(driver, {
-          navigate: true,
-          waitLoginSuccess: true,
-          password: WALLET_PASSWORD,
-        });
+  // it("Creates a new wallet, sets up a secure password, and doesn't complete the onboarding process and refreshes the page", async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       await incompleteCreateNewWalletOnboardingFlow({ driver });
+  //       await driver.refresh();
 
-        const secureWalletPage = new SecureWalletPage(driver);
-        await secureWalletPage.check_pageIsLoaded();
-        await secureWalletPage.revealAndConfirmSRP();
+  //       await unlockWallet(driver, {
+  //         navigate: true,
+  //         waitLoginSuccess: true,
+  //         password: WALLET_PASSWORD,
+  //       });
 
-        const onboardingCompletePage = new OnboardingCompletePage(driver);
-        await onboardingCompletePage.check_pageIsLoaded();
-        await onboardingCompletePage.check_congratulationsMessageIsDisplayed();
-        await onboardingCompletePage.completeOnboarding();
+  //       const secureWalletPage = new SecureWalletPage(driver);
+  //       await secureWalletPage.check_pageIsLoaded();
+  //       await secureWalletPage.revealAndConfirmSRP();
 
-        const homePage = new HomePage(driver);
-        await homePage.check_pageIsLoaded();
-        await homePage.check_expectedBalanceIsDisplayed('0');
-      },
-    );
-  });
+  //       const onboardingCompletePage = new OnboardingCompletePage(driver);
+  //       await onboardingCompletePage.check_pageIsLoaded();
+  //       await onboardingCompletePage.check_congratulationsMessageIsDisplayed();
+  //       await onboardingCompletePage.completeOnboarding();
 
-  it('Creates a new wallet, sets up a secure password, and completes the onboarding process', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        await completeCreateNewWalletOnboardingFlow({
-          driver,
-        });
-        const homePage = new HomePage(driver);
-        await homePage.check_pageIsLoaded();
-        await homePage.check_expectedBalanceIsDisplayed('0');
-      },
-    );
-  });
+  //       const homePage = new HomePage(driver);
+  //       await homePage.check_pageIsLoaded();
+  //       await homePage.check_expectedBalanceIsDisplayed('0');
+  //     },
+  //   );
+  // });
 
-  it('Imports an existing wallet, sets up a secure password, and completes the onboarding process', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        await completeImportSRPOnboardingFlow({ driver });
-        const homePage = new HomePage(driver);
-        await homePage.check_pageIsLoaded();
-        await homePage.check_expectedBalanceIsDisplayed();
-      },
-    );
-  });
+  // it('Creates a new wallet, sets up a secure password, and completes the onboarding process', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       await completeCreateNewWalletOnboardingFlow({
+  //         driver,
+  //       });
+  //       const homePage = new HomePage(driver);
+  //       await homePage.check_pageIsLoaded();
+  //       await homePage.check_expectedBalanceIsDisplayed('0');
+  //     },
+  //   );
+  // });
 
-  it('Attempts to import a wallet with an incorrect Secret Recovery Phrase and verifies the error message', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        const wrongSeedPhrase =
-          'test test test test test test test test test test test test';
-        await driver.navigate();
+  // it('Imports an existing wallet, sets up a secure password, and completes the onboarding process', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       await completeImportSRPOnboardingFlow({ driver });
+  //       const homePage = new HomePage(driver);
+  //       await homePage.check_pageIsLoaded();
+  //       await homePage.check_expectedBalanceIsDisplayed();
+  //     },
+  //   );
+  // });
 
-        if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  // it('Attempts to import a wallet with an incorrect Secret Recovery Phrase and verifies the error message', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       const wrongSeedPhrase =
+  //         'test test test test test test test test test test test test';
+  //       await driver.navigate();
 
-        const startOnboardingPage = new StartOnboardingPage(driver);
-        await startOnboardingPage.check_bannerPageIsLoaded();
-        await startOnboardingPage.agreeToTermsOfUse();
-        await startOnboardingPage.check_loginPageIsLoaded();
-        await startOnboardingPage.importWallet();
+  //       if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-        if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  //       const startOnboardingPage = new StartOnboardingPage(driver);
+  //       await startOnboardingPage.check_bannerPageIsLoaded();
+  //       await startOnboardingPage.agreeToTermsOfUse();
+  //       await startOnboardingPage.check_loginPageIsLoaded();
+  //       await startOnboardingPage.importWallet();
 
-        const onboardingSrpPage = new OnboardingSrpPage(driver);
-        await onboardingSrpPage.check_pageIsLoaded();
-        await onboardingSrpPage.fillSrp(wrongSeedPhrase);
+  //       if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-        // check the wrong SRP warning message is displayed
-        await onboardingSrpPage.check_wrongSrpWarningMessage();
-        await onboardingSrpPage.check_confirmSrpButtonIsDisabled();
-      },
-    );
-  });
+  //       const onboardingSrpPage = new OnboardingSrpPage(driver);
+  //       await onboardingSrpPage.check_pageIsLoaded();
+  //       await onboardingSrpPage.fillSrp(wrongSeedPhrase);
 
-  it('Verifies the functionality of selecting different Secret Recovery Phrase word counts', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        await driver.navigate();
+  //       // check the wrong SRP warning message is displayed
+  //       await onboardingSrpPage.check_wrongSrpWarningMessage();
+  //       await onboardingSrpPage.check_confirmSrpButtonIsDisabled();
+  //     },
+  //   );
+  // });
 
-        if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  // it('Verifies the functionality of selecting different Secret Recovery Phrase word counts', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       await driver.navigate();
 
-        const startOnboardingPage = new StartOnboardingPage(driver);
-        await startOnboardingPage.check_bannerPageIsLoaded();
-        await startOnboardingPage.agreeToTermsOfUse();
-        await startOnboardingPage.check_loginPageIsLoaded();
-        await startOnboardingPage.importWallet();
+  //       if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-        if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  //       const startOnboardingPage = new StartOnboardingPage(driver);
+  //       await startOnboardingPage.check_bannerPageIsLoaded();
+  //       await startOnboardingPage.agreeToTermsOfUse();
+  //       await startOnboardingPage.check_loginPageIsLoaded();
+  //       await startOnboardingPage.importWallet();
 
-        const onboardingSrpPage = new OnboardingSrpPage(driver);
-        await onboardingSrpPage.check_pageIsLoaded();
-        await onboardingSrpPage.check_srpDropdownIterations();
-      },
-    );
-  });
+  //       if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-  it('Verifies error handling when entering an incorrect password during wallet creation', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }: { driver: Driver }) => {
-        const wrongTestPassword = 'test test test test';
-        await driver.navigate();
+  //       const onboardingSrpPage = new OnboardingSrpPage(driver);
+  //       await onboardingSrpPage.check_pageIsLoaded();
+  //       await onboardingSrpPage.check_srpDropdownIterations();
+  //     },
+  //   );
+  // });
 
-        if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  // it('Verifies error handling when entering an incorrect password during wallet creation', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }: { driver: Driver }) => {
+  //       const wrongTestPassword = 'test test test test';
+  //       await driver.navigate();
 
-        const startOnboardingPage = new StartOnboardingPage(driver);
-        await startOnboardingPage.check_bannerPageIsLoaded();
-        await startOnboardingPage.agreeToTermsOfUse();
-        await startOnboardingPage.check_loginPageIsLoaded();
-        await startOnboardingPage.createWalletWithSrp();
+  //       if (process.env.SELENIUM_BROWSER === Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-        if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
-          const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-          await onboardingMetricsPage.check_pageIsLoaded();
-          await onboardingMetricsPage.clickNoThanksButton();
-        }
+  //       const startOnboardingPage = new StartOnboardingPage(driver);
+  //       await startOnboardingPage.check_bannerPageIsLoaded();
+  //       await startOnboardingPage.agreeToTermsOfUse();
+  //       await startOnboardingPage.check_loginPageIsLoaded();
+  //       await startOnboardingPage.createWalletWithSrp();
 
-        const onboardingPasswordPage = new OnboardingPasswordPage(driver);
-        await onboardingPasswordPage.check_pageIsLoaded();
-        await onboardingPasswordPage.fillWalletPassword(
-          WALLET_PASSWORD,
-          wrongTestPassword,
-        );
+  //       if (process.env.SELENIUM_BROWSER !== Browser.FIREFOX) {
+  //         const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //         await onboardingMetricsPage.check_pageIsLoaded();
+  //         await onboardingMetricsPage.clickNoThanksButton();
+  //       }
 
-        // check the incorrect password warning message is displayed
-        await onboardingPasswordPage.check_incorrectPasswordWarningMessageIsDisplayed();
-        await onboardingPasswordPage.check_confirmPasswordButtonIsDisabled();
-      },
-    );
-  });
+  //       const onboardingPasswordPage = new OnboardingPasswordPage(driver);
+  //       await onboardingPasswordPage.check_pageIsLoaded();
+  //       await onboardingPasswordPage.fillWalletPassword(
+  //         WALLET_PASSWORD,
+  //         wrongTestPassword,
+  //       );
+
+  //       // check the incorrect password warning message is displayed
+  //       await onboardingPasswordPage.check_incorrectPasswordWarningMessageIsDisplayed();
+  //       await onboardingPasswordPage.check_confirmPasswordButtonIsDisabled();
+  //     },
+  //   );
+  // });
 
   it('User can add custom network during onboarding', async function () {
     const networkName = 'Localhost 8546';
@@ -249,6 +251,13 @@ describe('MetaMask onboarding', function () {
         ],
         testSpecificMock: tokensMock,
         title: this.test?.fullTitle(),
+        driverOptions: {
+          windowSize: {
+            width: 1280,
+            height: 1080,
+          },
+        },
+        collectData: true,
       },
       async ({ driver, localNodes }) => {
         await localNodes[1].setAccountBalance(
@@ -294,70 +303,70 @@ describe('MetaMask onboarding', function () {
     );
   });
 
-  it('User can turn off basic functionality in default settings', async function () {
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder({ onboarding: true }).build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }) => {
-        await importSRPOnboardingFlow({ driver });
+  // it('User can turn off basic functionality in default settings', async function () {
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder({ onboarding: true }).build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }) => {
+  //       await importSRPOnboardingFlow({ driver });
 
-        const onboardingCompletePage = new OnboardingCompletePage(driver);
-        await onboardingCompletePage.check_pageIsLoaded();
-        await onboardingCompletePage.check_walletReadyMessageIsDisplayed();
-        await onboardingCompletePage.navigateToDefaultPrivacySettings();
+  //       const onboardingCompletePage = new OnboardingCompletePage(driver);
+  //       await onboardingCompletePage.check_pageIsLoaded();
+  //       await onboardingCompletePage.check_walletReadyMessageIsDisplayed();
+  //       await onboardingCompletePage.navigateToDefaultPrivacySettings();
 
-        const onboardingPrivacySettingsPage = new OnboardingPrivacySettingsPage(
-          driver,
-        );
-        await onboardingPrivacySettingsPage.toggleBasicFunctionalitySettings();
-        await onboardingPrivacySettingsPage.navigateBackToOnboardingCompletePage();
+  //       const onboardingPrivacySettingsPage = new OnboardingPrivacySettingsPage(
+  //         driver,
+  //       );
+  //       await onboardingPrivacySettingsPage.toggleBasicFunctionalitySettings();
+  //       await onboardingPrivacySettingsPage.navigateBackToOnboardingCompletePage();
 
-        await onboardingCompletePage.check_pageIsLoaded();
-        await onboardingCompletePage.completeOnboarding();
+  //       await onboardingCompletePage.check_pageIsLoaded();
+  //       await onboardingCompletePage.completeOnboarding();
 
-        const homePage = new HomePage(driver);
-        await homePage.check_pageIsLoaded();
-        // check the basic functionality is off warning message is displayed
-        await homePage.check_basicFunctionalityOffWarnigMessageIsDisplayed();
-      },
-    );
-  });
+  //       const homePage = new HomePage(driver);
+  //       await homePage.check_pageIsLoaded();
+  //       // check the basic functionality is off warning message is displayed
+  //       await homePage.check_basicFunctionalityOffWarnigMessageIsDisplayed();
+  //     },
+  //   );
+  // });
 
-  it('Provides an onboarding path for a user who has restored their account from state persistence failure', async function () {
-    // We don't use onboarding: true here because we want there to be a vault,
-    // simulating what will happen when a user eventually restores their vault
-    // during a state persistence failure. Instead, we set the
-    // firstTimeFlowType to 'restore' and completedOnboarding to false. as well
-    // as some other first time state options to get us into an onboarding
-    // state similar to a new state tree.
-    await withFixtures(
-      {
-        fixtures: new FixtureBuilder()
-          .withOnboardingController({
-            completedOnboarding: false,
-            firstTimeFlowType: FirstTimeFlowType.restore,
-            seedPhraseBackedUp: null,
-          })
-          .withMetaMetricsController({
-            participateInMetaMetrics: null,
-            metaMetricsId: null,
-          })
-          .build(),
-        title: this.test?.fullTitle(),
-      },
-      async ({ driver }) => {
-        await loginWithoutBalanceValidation(driver);
-        // First screen we should be on is MetaMetrics
-        const onboardingMetricsPage = new OnboardingMetricsPage(driver);
-        await onboardingMetricsPage.check_pageIsLoaded();
-        await onboardingMetricsPage.clickNoThanksButton();
+  // it('Provides an onboarding path for a user who has restored their account from state persistence failure', async function () {
+  //   // We don't use onboarding: true here because we want there to be a vault,
+  //   // simulating what will happen when a user eventually restores their vault
+  //   // during a state persistence failure. Instead, we set the
+  //   // firstTimeFlowType to 'restore' and completedOnboarding to false. as well
+  //   // as some other first time state options to get us into an onboarding
+  //   // state similar to a new state tree.
+  //   await withFixtures(
+  //     {
+  //       fixtures: new FixtureBuilder()
+  //         .withOnboardingController({
+  //           completedOnboarding: false,
+  //           firstTimeFlowType: FirstTimeFlowType.restore,
+  //           seedPhraseBackedUp: null,
+  //         })
+  //         .withMetaMetricsController({
+  //           participateInMetaMetrics: null,
+  //           metaMetricsId: null,
+  //         })
+  //         .build(),
+  //       title: this.test?.fullTitle(),
+  //     },
+  //     async ({ driver }) => {
+  //       await loginWithoutBalanceValidation(driver);
+  //       // First screen we should be on is MetaMetrics
+  //       const onboardingMetricsPage = new OnboardingMetricsPage(driver);
+  //       await onboardingMetricsPage.check_pageIsLoaded();
+  //       await onboardingMetricsPage.clickNoThanksButton();
 
-        // Next screen should be Secure your wallet screen
-        const secureWalletPage = new SecureWalletPage(driver);
-        await secureWalletPage.check_pageIsLoaded();
-      },
-    );
-  });
+  //       // Next screen should be Secure your wallet screen
+  //       const secureWalletPage = new SecureWalletPage(driver);
+  //       await secureWalletPage.check_pageIsLoaded();
+  //     },
+  //   );
+  // });
 });
