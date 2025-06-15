@@ -25,6 +25,7 @@ const {
 const {
   getServerMochaToBackground,
 } = require('./background-socket/server-mocha-to-background');
+const { injectDriver } = require('js-uitestfix');
 
 const tinyDelayMs = 200;
 const regularDelayMs = tinyDelayMs * 2;
@@ -126,6 +127,7 @@ async function withFixtures(options, testSuite) {
     ethConversionInUsd,
     monConversionInUsd,
     manifestFlags,
+    collectData = false,
   } = options;
 
   // Normalize localNodeOptions
@@ -278,30 +280,34 @@ async function withFixtures(options, testSuite) {
     extensionId = wd.extensionId;
     webDriver = driver.driver;
 
+    if (collectData) {
+      driver.driver = await injectDriver(await webDriver, title);
+    }
+
     if (process.env.SELENIUM_BROWSER === 'chrome') {
       await driver.checkBrowserForExceptions(ignoredConsoleErrors);
       await driver.checkBrowserForConsoleErrors(ignoredConsoleErrors);
     }
 
     let driverProxy;
-    if (process.env.E2E_DEBUG === 'true') {
-      driverProxy = new Proxy(driver, {
-        get(target, prop, receiver) {
-          const originalProperty = target[prop];
-          if (typeof originalProperty === 'function') {
-            return (...args) => {
-              console.log(
-                `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
-                  args,
-                ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
-              );
-              return originalProperty.bind(target)(...args);
-            };
-          }
-          return Reflect.get(target, prop, receiver);
-        },
-      });
-    }
+    // if (process.env.E2E_DEBUG === 'true') {
+    //   driverProxy = new Proxy(driver, {
+    //     get(target, prop, receiver) {
+    //       const originalProperty = target[prop];
+    //       if (typeof originalProperty === 'function') {
+    //         return (...args) => {
+    //           console.log(
+    //             `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
+    //               args,
+    //             ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
+    //           );
+    //           return originalProperty.bind(target)(...args);
+    //         };
+    //       }
+    //       return Reflect.get(target, prop, receiver);
+    //     },
+    //   });
+    // }
 
     console.log(`\nExecuting testcase: '${title}'\n`);
 

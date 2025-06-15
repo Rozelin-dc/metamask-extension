@@ -26,6 +26,7 @@ class ChromeDriver {
     openDevToolsForTabs,
     responsive,
     constrainWindowSize,
+    windowSize,
     port,
     proxyPort,
   }) {
@@ -50,7 +51,9 @@ class ChromeDriver {
       args.push('--auto-open-devtools-for-tabs');
     }
 
-    if (constrainWindowSize) {
+    if (windowSize) {
+      args.push(`--window-size=${windowSize.width},${windowSize.height}`);
+    } else if (constrainWindowSize) {
       args.push('--window-size=320,600');
     }
 

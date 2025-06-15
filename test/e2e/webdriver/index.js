@@ -10,6 +10,7 @@ async function buildWebDriver({
   port,
   timeOut,
   proxyPort,
+  windowSize,
 } = {}) {
   const browser = process.env.SELENIUM_BROWSER;
 
@@ -22,6 +23,7 @@ async function buildWebDriver({
     openDevToolsForTabs,
     port,
     constrainWindowSize,
+    windowSize,
     proxyPort,
   });
   const driver = new Driver(seleniumDriver, browser, extensionUrl, timeOut);
