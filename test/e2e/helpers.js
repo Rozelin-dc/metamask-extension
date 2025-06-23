@@ -5,7 +5,7 @@ const mockttp = require('mockttp');
 const detectPort = require('detect-port');
 const { difference } = require('lodash');
 const WebSocket = require('ws');
-const { injectDriver } = require('js-uitestfix');
+const { injectDriver } = require('@rozelin-dc/js-uitestfix');
 const createStaticServer = require('../../development/create-static-server');
 const { setupMocking } = require('./mock-e2e');
 const { Anvil } = require('./seeder/anvil');
@@ -284,6 +284,7 @@ async function withFixtures(options, testSuite) {
       driver.driver = await injectDriver(await webDriver, title, {
         outputDir: path.join(__dirname, '../../output'),
         configPath: path.join(__dirname, '../../config.properties'),
+        resultSavePath: path.join(__dirname, '../../result'),
       });
     }
 
