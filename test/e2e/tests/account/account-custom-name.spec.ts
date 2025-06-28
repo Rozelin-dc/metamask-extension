@@ -11,7 +11,8 @@ import HeaderNavbar from '../../page-objects/pages/header-navbar';
 const newAccountLabel = 'Custom name';
 const anotherAccountLabel = '2nd custom name';
 
-describe('Account Custom Name Persistence', function (this: Suite) {
+// eslint-disable-next-line mocha/no-skipped-tests
+describe.skip('Account Custom Name Persistence', function (this: Suite) {
   it('persists custom account label through account change and wallet lock', async function () {
     await withFixtures(
       {

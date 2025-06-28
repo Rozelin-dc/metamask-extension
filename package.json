@@ -362,6 +362,7 @@
     "ethereumjs-util": "^7.0.10",
     "extension-port-stream": "^3.0.0",
     "fast-json-patch": "^3.1.1",
+    "fast-xml-parser": "^5.2.5",
     "fuse.js": "^3.2.0",
     "he": "^1.2.0",
     "history": "^5.3.0",
@@ -457,6 +458,7 @@
     "@open-rpc/test-coverage": "^2.2.4",
     "@playwright/test": "^1.39.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@rozelin-dc/js-uitestfix": "^1.0.0",
     "@sentry/cli": "^2.19.4",
     "@slack/types": "^2.14.0",
     "@slack/webhook": "^7.0.5",
@@ -482,6 +484,8 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.6.1",
     "@tsconfig/node22": "^22.0.0",
+    "@types/babel__generator": "^7",
+    "@types/babel__traverse": "^7",
     "@types/babelify": "^7.3.7",
     "@types/browserify": "^12.0.37",
     "@types/chrome": "^0.0.268",
@@ -760,7 +764,8 @@
       "@metamask/eth-trezor-keyring>@trezor/connect-web>@trezor/connect>@trezor/blockchain-link>@solana/web3.js>bigint-buffer": false,
       "@metamask/eth-trezor-keyring>@trezor/connect-web>@trezor/connect>@trezor/transport>usb": false,
       "@metamask/test-dapp-solana>@solana/spl-token>@solana/buffer-layout-utils>bigint-buffer": false,
-      "@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false
+      "@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
+      "@rozelin-dc/js-uitestfix>sharp": false
     }
   },
   "packageManager": "yarn@4.9.1",
