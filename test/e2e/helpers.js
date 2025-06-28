@@ -373,6 +373,7 @@ async function withFixtures(options, testSuite) {
     // (Note: a Chrome browser error will unfortunately pop up after this success message)
     console.log(`\nSuccess on testcase: '${title}'\n`);
   } catch (error) {
+    // eslint-disable-next-line no-unused-vars
     failed = true;
     if (webDriver) {
       try {
@@ -400,47 +401,47 @@ async function withFixtures(options, testSuite) {
 
     throw error;
   } finally {
-    if (!failed || process.env.E2E_LEAVE_RUNNING !== 'true') {
-      await fixtureServer.stop();
-      for (const server of localNodes) {
-        if (server) {
-          await server.quit();
-        }
-      }
-
-      if (useBundler) {
-        await bundlerServer.stop();
-      }
-
-      if (webDriver) {
-        await driver.quit();
-      }
-      if (dapp) {
-        for (let i = 0; i < numberOfDapps; i++) {
-          if (dappServer[i] && dappServer[i].listening) {
-            await new Promise((resolve, reject) => {
-              dappServer[i].close((error) => {
-                if (error) {
-                  return reject(error);
-                }
-                return resolve();
-              });
-            });
-          }
-        }
-      }
-      if (phishingPageServer.isRunning()) {
-        await phishingPageServer.quit();
-      }
-
-      // Since mockServer could be stop'd at another location,
-      // use a try/catch to avoid an error
-      try {
-        await mockServer.stop();
-      } catch (e) {
-        console.log('mockServer already stopped');
+    // if (!failed || process.env.E2E_LEAVE_RUNNING !== 'true') {
+    await fixtureServer.stop();
+    for (const server of localNodes) {
+      if (server) {
+        await server.quit();
       }
     }
+
+    if (useBundler) {
+      await bundlerServer.stop();
+    }
+
+    if (webDriver) {
+      await driver.quit();
+    }
+    if (dapp) {
+      for (let i = 0; i < numberOfDapps; i++) {
+        if (dappServer[i] && dappServer[i].listening) {
+          await new Promise((resolve, reject) => {
+            dappServer[i].close((error) => {
+              if (error) {
+                return reject(error);
+              }
+              return resolve();
+            });
+          });
+        }
+      }
+    }
+    if (phishingPageServer.isRunning()) {
+      await phishingPageServer.quit();
+    }
+
+    // Since mockServer could be stop'd at another location,
+    // use a try/catch to avoid an error
+    try {
+      await mockServer.stop();
+    } catch (e) {
+      console.log('mockServer already stopped');
+    }
+    // }
   }
 }
 
