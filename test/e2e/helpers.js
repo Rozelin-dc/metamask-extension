@@ -5,6 +5,7 @@ const mockttp = require('mockttp');
 const detectPort = require('detect-port');
 const { difference } = require('lodash');
 const WebSocket = require('ws');
+const { injectDriver } = require('@rozelin-dc/js-uitestfix');
 const createStaticServer = require('../../development/create-static-server');
 const { setupMocking } = require('./mock-e2e');
 const { Anvil } = require('./seeder/anvil');
@@ -126,6 +127,7 @@ async function withFixtures(options, testSuite) {
     ethConversionInUsd,
     monConversionInUsd,
     manifestFlags,
+    collectData = false,
   } = options;
 
   // Normalize localNodeOptions
@@ -278,30 +280,38 @@ async function withFixtures(options, testSuite) {
     extensionId = wd.extensionId;
     webDriver = driver.driver;
 
+    if (collectData) {
+      driver.driver = await injectDriver(await webDriver, title, {
+        outputDir: path.join(__dirname, '../../output'),
+        configPath: path.join(__dirname, '../../config.properties'),
+        resultSavePath: path.join(__dirname, '../../result'),
+      });
+    }
+
     if (process.env.SELENIUM_BROWSER === 'chrome') {
       await driver.checkBrowserForExceptions(ignoredConsoleErrors);
       await driver.checkBrowserForConsoleErrors(ignoredConsoleErrors);
     }
 
     let driverProxy;
-    if (process.env.E2E_DEBUG === 'true') {
-      driverProxy = new Proxy(driver, {
-        get(target, prop, receiver) {
-          const originalProperty = target[prop];
-          if (typeof originalProperty === 'function') {
-            return (...args) => {
-              console.log(
-                `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
-                  args,
-                ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
-              );
-              return originalProperty.bind(target)(...args);
-            };
-          }
-          return Reflect.get(target, prop, receiver);
-        },
-      });
-    }
+    // if (process.env.E2E_DEBUG === 'true') {
+    //   driverProxy = new Proxy(driver, {
+    //     get(target, prop, receiver) {
+    //       const originalProperty = target[prop];
+    //       if (typeof originalProperty === 'function') {
+    //         return (...args) => {
+    //           console.log(
+    //             `${new Date().toISOString()} [driver] Called '${prop}' with arguments ${JSON.stringify(
+    //               args,
+    //             ).slice(0, 224)}`, // limit the length of the log entry to 224 characters
+    //           );
+    //           return originalProperty.bind(target)(...args);
+    //         };
+    //       }
+    //       return Reflect.get(target, prop, receiver);
+    //     },
+    //   });
+    // }
 
     console.log(`\nExecuting testcase: '${title}'\n`);
 
@@ -363,6 +373,7 @@ async function withFixtures(options, testSuite) {
     // (Note: a Chrome browser error will unfortunately pop up after this success message)
     console.log(`\nSuccess on testcase: '${title}'\n`);
   } catch (error) {
+    // eslint-disable-next-line no-unused-vars
     failed = true;
     if (webDriver) {
       try {
@@ -390,47 +401,47 @@ async function withFixtures(options, testSuite) {
 
     throw error;
   } finally {
-    if (!failed || process.env.E2E_LEAVE_RUNNING !== 'true') {
-      await fixtureServer.stop();
-      for (const server of localNodes) {
-        if (server) {
-          await server.quit();
-        }
-      }
-
-      if (useBundler) {
-        await bundlerServer.stop();
-      }
-
-      if (webDriver) {
-        await driver.quit();
-      }
-      if (dapp) {
-        for (let i = 0; i < numberOfDapps; i++) {
-          if (dappServer[i] && dappServer[i].listening) {
-            await new Promise((resolve, reject) => {
-              dappServer[i].close((error) => {
-                if (error) {
-                  return reject(error);
-                }
-                return resolve();
-              });
-            });
-          }
-        }
-      }
-      if (phishingPageServer.isRunning()) {
-        await phishingPageServer.quit();
-      }
-
-      // Since mockServer could be stop'd at another location,
-      // use a try/catch to avoid an error
-      try {
-        await mockServer.stop();
-      } catch (e) {
-        console.log('mockServer already stopped');
+    // if (!failed || process.env.E2E_LEAVE_RUNNING !== 'true') {
+    await fixtureServer.stop();
+    for (const server of localNodes) {
+      if (server) {
+        await server.quit();
       }
     }
+
+    if (useBundler) {
+      await bundlerServer.stop();
+    }
+
+    if (webDriver) {
+      await driver.quit();
+    }
+    if (dapp) {
+      for (let i = 0; i < numberOfDapps; i++) {
+        if (dappServer[i] && dappServer[i].listening) {
+          await new Promise((resolve, reject) => {
+            dappServer[i].close((error) => {
+              if (error) {
+                return reject(error);
+              }
+              return resolve();
+            });
+          });
+        }
+      }
+    }
+    if (phishingPageServer.isRunning()) {
+      await phishingPageServer.quit();
+    }
+
+    // Since mockServer could be stop'd at another location,
+    // use a try/catch to avoid an error
+    try {
+      await mockServer.stop();
+    } catch (e) {
+      console.log('mockServer already stopped');
+    }
+    // }
   }
 }
 
