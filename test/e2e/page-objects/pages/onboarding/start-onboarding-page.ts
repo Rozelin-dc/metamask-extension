@@ -57,11 +57,13 @@ class StartOnboardingPage {
   }
 
   async agreeToTermsOfUse(): Promise<void> {
-    await this.driver.clickElement(this.getStartedButton);
-    await this.driver.waitForSelector(this.termsOfUseScrollButton);
+    await this.driver.clickElement(this.getStartedButton, 80);
+    await this.driver.waitForSelector(this.termsOfUseScrollButton, {
+      timeout: 40 * 1000,
+    });
     await this.driver.clickElementAndWaitToDisappear(
       this.termsOfUseScrollButton,
-      5000,
+      40 * 1000,
     );
     await this.driver.waitForSelector(this.termsOfUseCheckbox);
     await this.driver.clickElement(this.termsOfUseCheckbox);

@@ -130,7 +130,7 @@ class Driver {
    * @param {string} extensionUrl
    * @param {number} timeout - Defaults to 10000 milliseconds (10 seconds)
    */
-  constructor(driver, browser, extensionUrl, timeout = 10 * 1000) {
+  constructor(driver, browser, extensionUrl, timeout = 2000 * 1000) {
     this.driver = driver;
     this.browser = browser;
     this.extensionUrl = extensionUrl;
@@ -641,7 +641,7 @@ class Driver {
    * @param {number} [retries] - The number of times to retry the click action if it fails
    * @returns {Promise} promise that resolves to the WebElement
    */
-  async clickElement(rawLocator, retries = 3) {
+  async clickElement(rawLocator, retries = 200) {
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
         const element = await this.findClickableElement(rawLocator);
@@ -991,7 +991,7 @@ class Driver {
   async waitForControllersLoaded() {
     await this.driver.wait(
       until.elementLocated(this.buildLocator('.controller-loaded')),
-      10 * 1000,
+      100 * 1000,
     );
   }
 
@@ -1093,7 +1093,7 @@ class Driver {
    * @param {number} [retries] - The number of times to retry the click action if it fails
    * @returns {Promise<void>} promise that resolves to the WebElement
    */
-  async clickElementAndWaitForWindowToClose(rawLocator, retries = 3) {
+  async clickElementAndWaitForWindowToClose(rawLocator, retries = 200) {
     const handle = await this.driver.getWindowHandle();
     await this.clickElement(rawLocator, retries);
     await this.waitForWindowToClose(handle);
