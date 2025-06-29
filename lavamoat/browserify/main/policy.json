@@ -1550,6 +1550,12 @@
         "URL": true
       }
     },
+    "@metamask/transaction-controller>@metamask/controller-utils": {
+      "packages": {
+        "cockatiel": true,
+        "browserify>buffer": true
+      }
+    },
     "eth-method-registry>@metamask/ethjs-contract": {
       "packages": {
         "@babel/runtime": true,
