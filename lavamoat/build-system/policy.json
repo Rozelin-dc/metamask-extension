@@ -1027,6 +1027,12 @@
         "semver": true
       }
     },
+    "@metamask/transaction-controller>@metamask/controller-utils": {
+      "packages": {
+        "cockatiel": true,
+        "browserify>buffer": true
+      }
+    },
     "@babel/eslint-parser>@nicolo-ribaudo/eslint-scope-5-internals": {
       "packages": {
         "webpack>eslint-scope": true

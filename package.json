@@ -29,6 +29,7 @@
     "start:test:mv2:flask": "ENABLE_MV3=false yarn start:test:flask --apply-lavamoat=false --snow=false",
     "start:test:mv2": "ENABLE_MV3=false BLOCKAID_FILE_CDN=static.cx.metamask.io/api/v1/confirmations/ppom yarn start:test --apply-lavamoat=false --snow=false",
     "build:test": "yarn env:e2e build test",
+    "build:test:ga": "yarn env:e2e build test --apply-lavamoat=false",
     "build:test:dev": "yarn env:e2e build:dev testDev --apply-lavamoat=false",
     "build:test:flask": "yarn build:test --build-type flask",
     "build:test:flask:mv2": "ENABLE_MV3=false yarn build:test:flask",
@@ -374,6 +375,7 @@
     "ethereumjs-util": "^7.0.10",
     "extension-port-stream": "^3.0.0",
     "fast-json-patch": "^3.1.1",
+    "fast-xml-parser": "^5.2.5",
     "fuse.js": "^3.2.0",
     "he": "^1.2.0",
     "history": "^5.3.0",
@@ -470,6 +472,7 @@
     "@open-rpc/test-coverage": "^2.2.4",
     "@playwright/test": "^1.39.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@rozelin-dc/js-uitestfix": "^1.0.0",
     "@sentry/cli": "^2.19.4",
     "@slack/types": "^2.14.0",
     "@slack/webhook": "^7.0.5",
@@ -495,6 +498,8 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.6.1",
     "@tsconfig/node22": "^22.0.0",
+    "@types/babel__generator": "^7",
+    "@types/babel__traverse": "^7",
     "@types/babelify": "^7.3.7",
     "@types/browserify": "^12.0.37",
     "@types/chrome": "^0.0.268",
@@ -782,7 +787,8 @@
       "@metamask/kernel-browser-runtime>@metamask/streams": false,
       "@metamask/kernel-browser-runtime>@metamask/kernel-store>better-sqlite3": false,
       "@metamask/logger>@metamask/streams": false,
-      "@metamask/streams": false
+      "@metamask/streams": false,
+      "@rozelin-dc/js-uitestfix>sharp": false
     }
   },
   "packageManager": "yarn@4.9.1",

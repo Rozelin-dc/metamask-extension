@@ -1,0 +1,67 @@
+name: Run e2e test fix process when PR created or updated
+
+on:
+  pull_request:
+
+permissions:
+  packages: read
+  contents: read
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_PACKAGES_NPM_READ_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable yarn
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install additional dependencies
+        run: yarn add -D @babel/generator@7.25.9 @babel/parser@7.25.9 @babel/traverse@7.25.9 @babel/types@7.25.9
+
+      - name: ID embedding
+        run: |
+          chmod +x ./scripts/id-embedding/index.sh
+          ./scripts/id-embedding/index.sh
+
+      - name: Remove additional dependencies
+        run: yarn remove @babel/generator @babel/parser @babel/traverse @babel/types
+
+      - name: Create settings file
+        run: cp .metamaskrc.dist .metamaskrc
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      # - name: Build for test
+      #   run: yarn build:test:ga
+
+      - name: Start server
+        run: |
+          yarn start:test &
+          sleep 120
+
+      # - name: Run e2e tests
+      #   run: |
+      #     sudo apt-get install -y xvfb
+      #     sudo Xvfb :99 -ac &
+      #     export DISPLAY=:99
+      #     yarn test:e2e:chrome
+
+      - name: Run e2e tests
+        run: |
+          sudo apt-get install -y xvfb
+          sudo Xvfb :99 -ac &
+          export DISPLAY=:99
+          yarn test:e2e:single test/e2e/tests/onboarding/onboarding.spec.ts --browser=chrome
