@@ -45,7 +45,7 @@ jobs:
         uses: nanasess/setup-chromedriver@v2
 
       - name: Build for test
-        run: yarn build:test
+        run: yarn build:test -- --apply-lavamoat=false
 
       # - name: Run e2e tests
       #   run: |
