@@ -44,8 +44,13 @@ jobs:
       - name: Install ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
-      - name: Build for test
-        run: yarn build:test:ga
+      # - name: Build for test
+      #   run: yarn build:test:ga
+
+      - name: Start server
+        run: |
+          yarn start:test &
+          sleep 120
 
       # - name: Run e2e tests
       #   run: |
